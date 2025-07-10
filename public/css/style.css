@@ -1,0 +1,227 @@
+/* public/css/style.css */
+
+/* html, body {
+  width: 100%;
+  overflow-x: hidden;
+} */
+
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #99f699, #feb0c2, #ffe9c7, #e6f2ff);
+  background-size: 1000% 1000%;
+  animation: gradientFlow 15s ease infinite;
+  padding: 30px;
+  text-align: center;
+  font-size: 24px;
+}
+
+@keyframes gradientFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+h1 {
+  font-size: 32px;
+  color: #333;
+  margin-bottom: 30px;
+}
+
+form {
+  background: white;
+  padding: 30px 40px;
+  border-radius: 12px;
+  border: 8px solid white;
+  transform: rotate(-2.5deg);
+  box-shadow:
+    0 8px 20px rgba(255, 182, 193, 0.3),
+    0 12px 30px rgba(255, 160, 122, 0.2),
+    0 6px 12px rgba(230, 230, 250, 0.3),
+    inset 0 0 0 3px linear-gradient(135deg, #ffc0cb, #ffa07a, #e6e6fa);
+  position: relative;
+  
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+form:hover {
+  transform: rotate(0deg) scale(1.01);
+  box-shadow:
+    0 10px 25px rgba(255, 192, 203, 0.5),
+    0 16px 32px rgba(255, 160, 122, 0.3);
+}
+
+
+.heart-deco {
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  font-size: 32px;
+  transform: rotate(-10deg);
+  animation: pop 1.8s ease-in-out infinite;
+  z-index: 10;
+}
+
+@keyframes pop {
+  0%, 100% { transform: scale(1) rotate(-10deg); }
+  50% { transform: scale(1.15) rotate(-10deg); }
+}
+
+
+input[type="file"] {
+  margin: 10px 0;
+}
+
+button {
+  padding: 14px 28px;
+  font-size: 18px;
+  background: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+button:focus {
+  outline: none;
+}
+
+button:hover {
+  background: #45a049;
+}
+
+.message {
+  margin-top: 15px;
+  font-weight: bold;
+}
+
+.success {
+  color: green;
+}
+
+.error {
+  color: red;
+}
+
+.preview {
+  margin-top: 15px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.preview img,
+.preview video {
+  max-width: 150px;
+  border-radius: 5px;
+}
+
+#loader {
+  display: none;
+  margin-top: 20px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}
+
+.sablier {
+  font-size: 40px;
+  animation: spin 1.2s infinite;
+  display: inline-block;
+  margin-bottom: 5px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(180deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* Responsive Design - Ajout automatique */
+
+@media (max-width: 480px) {
+  body {
+    font-size: 18px;
+    padding: 15px;
+  }
+
+  h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+
+  form {
+    width: 85%;
+    padding: 20px;
+  }
+
+  button {
+    font-size: 16px;
+    padding: 12px 24px;
+    width: 100%;
+  }
+
+  .preview img,
+  .preview video {
+    max-width: 100px;
+  }
+
+  .sablier {
+    font-size: 28px;
+  }
+
+  .heart-deco {
+    font-size: 24px;
+    top: -15px;
+    right: -15px;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  body {
+    font-size: 20px;
+    padding: 20px;
+  }
+
+  h1 {
+    font-size: 28px;
+  }
+
+  form {
+    width: 80%;
+    padding: 25px;
+  }
+
+  button {
+    font-size: 17px;
+    padding: 12px 26px;
+  }
+
+  .preview img,
+  .preview video {
+    max-width: 120px;
+  }
+
+  .sablier {
+    font-size: 36px;
+  }
+
+  .heart-deco {
+    font-size: 28px;
+  }
+}

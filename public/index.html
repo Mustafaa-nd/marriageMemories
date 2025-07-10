@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>The MBAYEs' Memories</title>
+    <link rel="stylesheet" href="./css/style.css" />
+  </head>
+  <body>
+    <h1>Nous serions ravis que vous partagiez avec nous vos souvenirs du mariage.</h1>
+
+    <form id="uploadForm" enctype="multipart/form-data">
+      <div class="heart-deco">❤️+❤️</div>
+      <div class="message" id="message"></div>
+      <div id="loader">
+        <div class="sablier">⏳</div>
+        <div>Merci de patienter pendant l’envoi...</div>
+      </div>
+      <input
+        type="file"
+        name="files"
+        id="files"
+        accept="image/*,video/*"
+        multiple
+      />
+      <br />
+      <button type="submit">Envoyer</button>
+      <div class="preview" id="preview"></div>
+    </form>
+
+    <script src="./js/main.js"></script>
+  </body>
+</html>
