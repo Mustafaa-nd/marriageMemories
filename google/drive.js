@@ -3,8 +3,8 @@ const path = require("path");
 const readline = require("readline");
 const { google } = require("googleapis");
 
-const CREDENTIALS_PATH = path.join(__dirname, "credentials.json");
-const TOKEN_PATH = path.join(__dirname, "token.json");
+const CREDENTIALS_PATH = "/etc/secrets/credentials.json";
+const TOKEN_PATH = "/etc/secrets/token.json";
 const SCOPES = ["https://www.googleapis.com/auth/drive.file"];
 
 function authorize(callback) {

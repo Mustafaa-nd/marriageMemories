@@ -1,5 +1,5 @@
 .env
 google/credentials.json
 google/token.json
-
-node_modules
+upload/
+node_modules/
