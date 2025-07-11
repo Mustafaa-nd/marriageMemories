@@ -9,11 +9,16 @@ const { uploadFileToDrive } = require("./google/drive");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const MAX_SIZE_MB = 100;
+const MAX_SIZE_MB = 300;
 const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
 
 app.use(cors());
 app.use(express.static("public"));
+
+if (!fs.existsSync("upload")) {
+  fs.mkdirSync("upload");
+}
+
 
 // Multer pour stocker temporairement les fichiers dans /upload
 const storage = multer.diskStorage({

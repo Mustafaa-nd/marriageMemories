@@ -4,7 +4,7 @@
   const message = document.getElementById("message");
   const preview = document.getElementById("preview");
 
-  const MAX_SIZE_MB = 100;
+  const MAX_SIZE_MB = 300;
   let selectedFiles = [];
   let messageId = 0;  // identifiant global du message affiché
 
@@ -12,7 +12,7 @@
     for (let file of fileInput.files) {
       if (selectedFiles.some(f => f.name === file.name && f.size === file.size)) continue;
       if (file.size > MAX_SIZE_MB * 1024 * 1024) {
-        showMessage(`Attention, le fichier "${file.name}" dépasse 100 Mo.`, "error");
+        showMessage(`Attention, le fichier "${file.name}" dépasse 300 Mo.`, "error");
         continue;
       }
       selectedFiles.push(file);
