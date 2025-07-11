@@ -11,6 +11,8 @@ const PORT = process.env.PORT || 3000;
 
 const MAX_FILE_SIZE_MB = 300;
 const MAX_TOTAL_SIZE_MB = 500;
+const MAX_FILES = 30;
+
 
 const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 const MAX_TOTAL_SIZE_BYTES = MAX_TOTAL_SIZE_MB * 1024 * 1024;
@@ -35,7 +37,7 @@ const upload = multer({
   storage,
   limits: {
     fileSize: MAX_FILE_SIZE_BYTES,
-    files: 30, // sécurité côté serveur
+    files: MAX_FILES, // sécurité côté serveur
     fieldSize: MAX_TOTAL_SIZE_BYTES, // limite la taille totale de tous les champs du formulaire
   },
   fileFilter: (req, file, cb) => {
