@@ -9,8 +9,12 @@ const { uploadFileToDrive } = require("./google/drive");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const MAX_SIZE_MB = 300;
-const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
+const MAX_FILE_SIZE_MB = 300;
+const MAX_TOTAL_SIZE_MB = 500;
+
+const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+const MAX_TOTAL_SIZE_BYTES = MAX_TOTAL_SIZE_MB * 1024 * 1024;
+
 
 app.use(cors());
 app.use(express.static("public"));
@@ -29,7 +33,11 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage,
-  limits: { fileSize: MAX_SIZE_BYTES },
+  limits: {
+    fileSize: MAX_FILE_SIZE_BYTES,
+    files: 30, // sécurité côté serveur
+    fieldSize: MAX_TOTAL_SIZE_BYTES, // limite la taille totale de tous les champs du formulaire
+  },
   fileFilter: (req, file, cb) => {
     const allowedMimeTypes = [
       "image/jpeg",
@@ -47,6 +55,7 @@ const upload = multer({
   },
 });
 
+
 // Important : désactiver les parseurs incompatibles avec multer
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -62,7 +71,7 @@ app.use((req, res, next) => {
 app.post("/upload", (req, res, next) => {
   console.log("📤 Champs reçus via multer :", req.files?.map(f => f.fieldname));
   console.log("📤 Corps brut reçu :", req.body);
-  upload.array("files", 15)(req, res, function (err) {
+  upload.array("files", MAX_FILES)(req, res, function (err) {
     if (err instanceof multer.MulterError) {
       console.error("❌ MulterError attrapé :", err.message);
       return res.status(400).json({ success: false, message: err.message });
@@ -103,10 +112,10 @@ app.post("/upload", (req, res, next) => {
 
 // Middleware de gestion des erreurs
 app.use((err, req, res, next) => {
-  if (err.code === "LIMIT_FILE_SIZE") {
+  if (err.code === "LIMIT_FILE_SIZE" || err.code === "LIMIT_FIELD_SIZE") {
     return res.status(413).json({
       success: false,
-      message: `Erreur : Le fichier dépasse la taille maximale autorisée de ${MAX_SIZE_MB} Mo.`,
+      message: `Erreur : La requête dépasse la taille maximale autorisée de ${MAX_TOTAL_SIZE_MB} Mo.`,
     });
   }
 
