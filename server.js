@@ -47,8 +47,34 @@ const upload = multer({
   },
 });
 
+// Important : désactiver les parseurs incompatibles avec multer
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+
+app.use((req, res, next) => {
+  console.log("📥 Requête reçue :", req.method, req.url);
+  next();
+});
+
+
 // Route POST /upload
-app.post("/upload", upload.array("files", 15), async (req, res) => {
+app.post("/upload", (req, res, next) => {
+  console.log("📤 Champs reçus via multer :", req.files?.map(f => f.fieldname));
+  console.log("📤 Corps brut reçu :", req.body);
+  upload.array("files", 15)(req, res, function (err) {
+    if (err instanceof multer.MulterError) {
+      console.error("❌ MulterError attrapé :", err.message);
+      return res.status(400).json({ success: false, message: err.message });
+    } else if (err) {
+      console.error("❌ Erreur inconnue dans upload.array :", err);
+      return res.status(500).json({ success: false, message: err.message });
+    }
+
+    // Si pas d'erreur, on continue vers le traitement des fichiers :
+    next();
+  });
+}, async (req, res) => {
   try {
     const files = req.files;
     if (!files || files.length === 0) return res.status(400).send("Aucun fichier reçu");
