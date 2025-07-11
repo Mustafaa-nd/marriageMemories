@@ -2,4 +2,4 @@
 google/credentials.json
 google/token.json
 
-mode_modules
+node_modules
