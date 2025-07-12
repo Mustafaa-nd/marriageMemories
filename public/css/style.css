@@ -77,6 +77,8 @@ form:hover {
 
 input[type="file"] {
   margin: 10px 0;
+  font-size: 18px;
+  padding: 10px;
 }
 
 button {
@@ -155,6 +157,26 @@ button:hover {
 /* Responsive Design - Ajout automatique */
 
 @media (max-width: 480px) {
+
+  input[type="file"] {
+    font-size: 16px;
+    padding: 8px;
+    width: 100%; /* prend toute la largeur */
+  }
+
+  .preview {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .preview img,
+  .preview video {
+    max-width: 140px;
+    max-height: 140px;
+    border-radius: 8px;
+  }
+
+
   body {
     font-size: 18px;
     padding: 15px;
