@@ -3,6 +3,7 @@ const multer = require("multer");
 const cors = require("cors");
 const path = require("path");
 const fs = require("fs");
+const ffmpeg = require("fluent-ffmpeg");
 require("dotenv").config();
 const { uploadFileToDrive } = require("./google/drive");
 
@@ -13,10 +14,8 @@ const MAX_FILE_SIZE_MB = 300;
 const MAX_TOTAL_SIZE_MB = 500;
 const MAX_FILES = 30;
 
-
 const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 const MAX_TOTAL_SIZE_BYTES = MAX_TOTAL_SIZE_MB * 1024 * 1024;
-
 
 app.use(cors());
 app.use(express.static("public"));
@@ -25,8 +24,7 @@ if (!fs.existsSync("upload")) {
   fs.mkdirSync("upload");
 }
 
-
-// Multer pour stocker temporairement les fichiers dans /upload
+// Multer config
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, "upload"),
   filename: (req, file, cb) =>
@@ -37,8 +35,8 @@ const upload = multer({
   storage,
   limits: {
     fileSize: MAX_FILE_SIZE_BYTES,
-    files: MAX_FILES, // sécurité côté serveur
-    fieldSize: MAX_TOTAL_SIZE_BYTES, // limite la taille totale de tous les champs du formulaire
+    files: MAX_FILES,
+    fieldSize: MAX_TOTAL_SIZE_BYTES,
   },
   fileFilter: (req, file, cb) => {
     const allowedMimeTypes = [
@@ -57,32 +55,35 @@ const upload = multer({
   },
 });
 
-
-// Important : désactiver les parseurs incompatibles avec multer
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-
+// Pour logs des requêtes
 app.use((req, res, next) => {
-  console.log("📥 Requête reçue :", req.method, req.url);
+  console.log("Requête reçue :", req.method, req.url);
   next();
 });
 
+// Conversion .mov -> .mp4
+function convertMovToMp4(inputPath, outputPath) {
+  return new Promise((resolve, reject) => {
+    ffmpeg(inputPath)
+      .outputOptions("-c:v libx264")
+      .toFormat("mp4")
+      .save(outputPath)
+      .on("end", () => resolve(outputPath))
+      .on("error", (err) => reject(err));
+  });
+}
 
 // Route POST /upload
 app.post("/upload", (req, res, next) => {
-  console.log("📤 Champs reçus via multer :", req.files?.map(f => f.fieldname));
-  console.log("📤 Corps brut reçu :", req.body);
   upload.array("files", MAX_FILES)(req, res, function (err) {
     if (err instanceof multer.MulterError) {
-      console.error("❌ MulterError attrapé :", err.message);
+      console.error("MulterError attrapé :", err.message);
       return res.status(400).json({ success: false, message: err.message });
     } else if (err) {
-      console.error("❌ Erreur inconnue dans upload.array :", err);
+      console.error("Erreur inconnue dans upload.array :", err);
       return res.status(500).json({ success: false, message: err.message });
     }
 
-    // Si pas d'erreur, on continue vers le traitement des fichiers :
     next();
   });
 }, async (req, res) => {
@@ -94,25 +95,44 @@ app.post("/upload", (req, res, next) => {
 
     for (const file of files) {
       try {
-        console.log(`Upload en cours : ${file.originalname}`);
-        const fileId = await uploadFileToDrive(file.path, file.originalname);
-        fs.unlinkSync(file.path);
-        console.log(`Upload réussi : ${file.originalname} (ID: ${fileId})`);
-        console.log(`🗑️ Fichier temporaire supprimé : ${file.path}`);
-        results.push({ name: file.originalname, fileId });
+        let filePath = file.path;
+        let fileName = file.originalname;
+        let mimeType = file.mimetype;
+
+        // 🎞️ Conversion MOV ➝ MP4
+        if (file.mimetype === "video/quicktime" && path.extname(file.originalname).toLowerCase() === ".mov") {
+          const newFilename = file.originalname.replace(/\.mov$/i, ".mp4");
+          const convertedPath = filePath.replace(/\.mov$/i, ".mp4");
+
+          console.log(`🎞️ Conversion de ${file.originalname} en MP4...`);
+          await convertMovToMp4(file.path, convertedPath);
+          fs.unlinkSync(file.path); // Supprime l'original
+
+          filePath = convertedPath;
+          fileName = newFilename;
+          mimeType = "video/mp4";
+        }
+
+        console.log(`Upload en cours : ${fileName}`);
+        const fileId = await uploadFileToDrive(filePath, fileName, mimeType);
+        fs.unlinkSync(filePath);
+        console.log(`Upload réussi : ${fileName} (ID: ${fileId})`);
+        results.push({ name: fileName, fileId });
+
       } catch (innerErr) {
         console.error(`Échec pour le fichier ${file.originalname} : ${innerErr.message}`);
       }
     }
 
     return res.status(200).json({ success: true, uploads: results });
+
   } catch (err) {
     console.error("Erreur d’upload globale :", err);
     return res.status(500).json({ success: false, message: err.message });
   }
 });
 
-// Middleware de gestion des erreurs
+// Middleware d'erreur
 app.use((err, req, res, next) => {
   if (err.code === "LIMIT_FILE_SIZE" || err.code === "LIMIT_FIELD_SIZE") {
     return res.status(413).json({
@@ -134,7 +154,6 @@ app.use((err, req, res, next) => {
     message: "Erreur interne du serveur.",
   });
 });
-
 
 app.listen(PORT, () => {
   console.log(`Serveur démarré sur http://localhost:${PORT}`);

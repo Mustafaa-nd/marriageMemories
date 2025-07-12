@@ -25,21 +25,21 @@ function authorize(callback) {
 function getAccessToken(oAuth2Client, callback) {
   const authUrl = oAuth2Client.generateAuthUrl({ access_type: "offline", scope: SCOPES });
 
-  console.log("\n👉 Ouvre cette URL dans ton navigateur pour autoriser l'accès :\n", authUrl);
+  console.log("\nOuvre cette URL dans ton navigateur pour autoriser l'accès :\n", authUrl);
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-  rl.question("\n🧾 Colle ici le code affiché après autorisation : ", (code) => {
+  rl.question("\nColle ici le code affiché après autorisation : ", (code) => {
     rl.close();
     oAuth2Client.getToken(code, (err, token) => {
       if (err) return console.error("❌ Erreur lors de l'obtention du token :", err.message);
       oAuth2Client.setCredentials(token);
       fs.writeFileSync(TOKEN_PATH, JSON.stringify(token));
-      console.log("✅ Jeton enregistré avec succès !");
+      console.log("Jeton enregistré avec succès !");
       callback(oAuth2Client);
     });
   });
 }
 
-function uploadFileToDrive(filePath, filename) {
+function uploadFileToDrive(filePath, filename, mimetype) {
   return new Promise((resolve, reject) => {
     authorize(async (auth) => {
       const drive = google.drive({ version: "v3", auth });
@@ -48,7 +48,7 @@ function uploadFileToDrive(filePath, filename) {
         parents: [process.env.GOOGLE_FOLDER_ID],
       };
       const media = {
-        mimeType: "image/jpeg",
+        mimeType: mimetype, // ici on passe le mimetype réel
         body: fs.createReadStream(filePath),
       };
 
@@ -58,14 +58,15 @@ function uploadFileToDrive(filePath, filename) {
           media,
           fields: "id",
         });
-        console.log(`✅ Upload réussi : ${filename} (ID: ${res.data.id})`);
+        console.log(`Upload réussi : ${filename} (ID: ${res.data.id})`);
         resolve(res.data.id);
       } catch (err) {
-        console.error(`❌ Upload échoué pour ${filename} :`, err.message);
+        console.error(`Upload échoué pour ${filename} :`, err.message);
         reject(err);
       }
     });
   });
 }
+
 
 module.exports = { uploadFileToDrive };

@@ -88,7 +88,7 @@
     xhr.onload = function () {
       loader.style.display = "none";
       if (xhr.status === 200) {
-        showMessage("Souvenir(s) envoyé(s) avec succès ! Mr et Mme MBAYE vous remercie pour votre présence ❤️", "success");
+        showMessage("Souvenir(s) envoyé(s) avec succès ! Mr et Mme MBAYE vous remercient pour votre présence ❤️", "success");
         selectedFiles = [];
         updatePreview();
       } else {
