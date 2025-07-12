@@ -157,11 +157,32 @@ button:hover {
 /* Responsive Design - Ajout automatique */
 
 @media (max-width: 480px) {
+  body {
+    font-size: 18px;
+    padding: 15px;
+  }
+
+  h1 {
+    font-size: 22px;
+    margin-bottom: 20px;
+  }
+
+  form {
+    width: 90%;
+    padding: 16px;
+    transform: none;
+  }
 
   input[type="file"] {
     font-size: 16px;
-    padding: 8px;
-    width: 100%; /* prend toute la largeur */
+    padding: 10px;
+    width: 100%;
+  }
+
+  button {
+    font-size: 18px;
+    padding: 14px 24px;
+    width: 100%;
   }
 
   .preview {
@@ -171,36 +192,10 @@ button:hover {
 
   .preview img,
   .preview video {
-    max-width: 140px;
-    max-height: 140px;
+    max-width: 90vw;
+    max-height: 250px;
     border-radius: 8px;
-  }
-
-
-  body {
-    font-size: 18px;
-    padding: 15px;
-  }
-
-  h1 {
-    font-size: 24px;
-    margin-bottom: 20px;
-  }
-
-  form {
-    width: 85%;
-    padding: 20px;
-  }
-
-  button {
-    font-size: 16px;
-    padding: 12px 24px;
-    width: 100%;
-  }
-
-  .preview img,
-  .preview video {
-    max-width: 100px;
+    object-fit: contain;
   }
 
   .sablier {
@@ -212,7 +207,13 @@ button:hover {
     top: -15px;
     right: -15px;
   }
+
+  .message {
+    font-size: 16px;
+    margin-top: 12px;
+  }
 }
+
 
 @media (min-width: 481px) and (max-width: 768px) {
   body {
